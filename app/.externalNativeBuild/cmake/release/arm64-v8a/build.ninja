@@ -64,6 +64,22 @@ build CMakeFiles/native-activity.dir/main.cpp.o: CXX_COMPILER__native-activity /
   IN_ABS = /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/src/main/cpp/main.cpp
   OBJECT_DIR = CMakeFiles/native-activity.dir
   OBJECT_FILE_DIR = CMakeFiles/native-activity.dir
+build CMakeFiles/native-activity.dir/drawFrame.cpp.o: CXX_COMPILER__native-activity /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/src/main/cpp/drawFrame.cpp || cmake_order_depends_target_native-activity
+  DEFINES = -Dnative_activity_EXPORTS
+  DEP_FILE = CMakeFiles/native-activity.dir/drawFrame.cpp.o.d
+  FLAGS = -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti  -std=gnu++11 -O2 -DNDEBUG -O2 -DNDEBUG  -fPIC
+  INCLUDES = -I/Users/takemura/Library/Android/sdk/ndk-bundle/sources/android/native_app_glue -isystem /Users/takemura/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include -isystem /Users/takemura/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/include -isystem /Users/takemura/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include/backward
+  IN_ABS = /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/src/main/cpp/drawFrame.cpp
+  OBJECT_DIR = CMakeFiles/native-activity.dir
+  OBJECT_FILE_DIR = CMakeFiles/native-activity.dir
+build CMakeFiles/native-activity.dir/Util.cpp.o: CXX_COMPILER__native-activity /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/src/main/cpp/Util.cpp || cmake_order_depends_target_native-activity
+  DEFINES = -Dnative_activity_EXPORTS
+  DEP_FILE = CMakeFiles/native-activity.dir/Util.cpp.o.d
+  FLAGS = -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti  -std=gnu++11 -O2 -DNDEBUG -O2 -DNDEBUG  -fPIC
+  INCLUDES = -I/Users/takemura/Library/Android/sdk/ndk-bundle/sources/android/native_app_glue -isystem /Users/takemura/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include -isystem /Users/takemura/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/include -isystem /Users/takemura/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/include/backward
+  IN_ABS = /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/src/main/cpp/Util.cpp
+  OBJECT_DIR = CMakeFiles/native-activity.dir
+  OBJECT_FILE_DIR = CMakeFiles/native-activity.dir
 
 # =============================================================================
 # Link build statements for SHARED_LIBRARY target native-activity
@@ -72,7 +88,7 @@ build CMakeFiles/native-activity.dir/main.cpp.o: CXX_COMPILER__native-activity /
 #############################################
 # Link the shared library /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/build/intermediates/cmake/release/obj/arm64-v8a/libnative-activity.so
 
-build /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/build/intermediates/cmake/release/obj/arm64-v8a/libnative-activity.so: CXX_SHARED_LIBRARY_LINKER__native-activity CMakeFiles/native-activity.dir/main.cpp.o | libapp-glue.a || libapp-glue.a
+build /Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/build/intermediates/cmake/release/obj/arm64-v8a/libnative-activity.so: CXX_SHARED_LIBRARY_LINKER__native-activity CMakeFiles/native-activity.dir/main.cpp.o CMakeFiles/native-activity.dir/drawFrame.cpp.o CMakeFiles/native-activity.dir/Util.cpp.o | libapp-glue.a || libapp-glue.a
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti  -std=gnu++11 -O2 -DNDEBUG -O2 -DNDEBUG
   LINK_FLAGS = -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Qunused-arguments -Wl,-z,relro -Wl,-z,now -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Qunused-arguments -Wl,-z,relro -Wl,-z,now
   LINK_LIBRARIES = -landroid libapp-glue.a -lEGL -lGLESv1_CM -llog -lm "/Users/takemura/Library/Android/sdk/ndk-bundle/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/libgnustl_static.a"
