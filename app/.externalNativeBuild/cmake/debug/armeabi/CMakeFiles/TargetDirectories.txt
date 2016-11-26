@@ -1,0 +1,4 @@
+/Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/edit_cache.dir
+/Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/rebuild_cache.dir
+/Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/native-activity.dir
+/Users/takemura/Documents/AndroidStudioProjects/OpenGLTest/app/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/app-glue.dir
