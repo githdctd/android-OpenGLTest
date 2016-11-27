@@ -13,12 +13,14 @@ static double prev_time = 0;
 static int frame_count = 0;
 
 const char gVertexShader[] =
-        "attribute vec4 aPosition;\n"
-        "attribute vec4 aColor;\n"
+        "attribute vec3 aPosition;\n"
+        "attribute vec3 aColor;\n"
+        "uniform mediump mat4 uMVMat;\n"
+        "uniform mediump mat4 uPMat;\n"
         "varying vec4 vColor;\n"
         "void main() {\n"
-        "  gl_Position = aPosition;\n"
-        "  vColor = aColor;\n"
+        "  gl_Position = uMVMat * uPMat * vec4(aPosition, 1.0);\n"
+        "  vColor = vec4(aColor, 0.0);\n"
         "}\n";
 
 
@@ -59,6 +61,8 @@ createProgram(const char* pVertexSource, const char* pFragmentSource)
 static GLuint gProgram;
 static GLuint gaPositionHandle;
 static GLuint gaColorHandle;
+static GLint guMVMatrix;
+static GLint guPMatrix;
 
 int
 init_frame(struct gfx *gfx)
@@ -67,6 +71,12 @@ init_frame(struct gfx *gfx)
     gProgram = createProgram(gVertexShader, gFragmentShader);
     gaPositionHandle = glGetAttribLocation(gProgram, "aPosition");
     gaColorHandle = glGetAttribLocation(gProgram, "aColor");
+    guMVMatrix = glGetUniformLocation(gProgram, "uMVMat");
+    guPMatrix = glGetUniformLocation(gProgram, "uPMat");
+    Util::log("aPosition = %ld\n", gaPositionHandle);
+    Util::log("aColor = %ld\n", gaColorHandle);
+    Util::log("guMVMatrix = %ld\n", guMVMatrix);
+    Util::log("guPMatrix = %ld\n", guPMatrix);
 
     return 0;
 }
@@ -81,17 +91,34 @@ void draw_frame(struct gfx *gfx)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    const GLfloat mat_mv[] = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+    };
+    const GLfloat mat_p[] = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+    };
+
     const GLfloat points[] = {
-             0.0f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f,
-            -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-             0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+             0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
     };
     int stride = sizeof(GLfloat)*6;
     glUseProgram(gProgram);
-    glVertexAttribPointer(gaPositionHandle, 2, GL_FLOAT, GL_FALSE, stride, points);
+
+    glUniformMatrix4fv(guMVMatrix, 1, GL_FALSE, mat_mv);
+    glUniformMatrix4fv(guPMatrix, 1, GL_FALSE, mat_p);
+    glVertexAttribPointer(gaPositionHandle, 3, GL_FLOAT, GL_FALSE, stride, points);
     glEnableVertexAttribArray(gaPositionHandle);
-    glVertexAttribPointer(gaColorHandle, 4, GL_FLOAT, GL_FALSE, stride, &points[2]);
+    glVertexAttribPointer(gaColorHandle, 3, GL_FLOAT, GL_FALSE, stride, &points[3]);
     glEnableVertexAttribArray(gaColorHandle);
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     eglSwapBuffers(gfx->display, gfx->surface);
