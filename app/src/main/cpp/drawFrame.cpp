@@ -6,6 +6,9 @@
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
 
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "Util.h"
 #include "drawFrame.h"
 
@@ -118,6 +121,27 @@ void draw_frame(struct gfx *gfx)
     glEnableVertexAttribArray(gaPositionHandle);
     glVertexAttribPointer(gaColorHandle, 3, GL_FLOAT, GL_FALSE, stride, &points[3]);
     glEnableVertexAttribArray(gaColorHandle);
+
+    {
+        using namespace Eigen;
+
+        // 平行移動(x, y, z)
+        Translation<float, 3> translation = Translation<float, 3>(10.0f, 0.5f, -3.0f);
+
+        // スケーリング
+        DiagonalMatrix<float, 3> scaling = Scaling(2.0f, 1.5f, 1.0f);
+
+        // 回転(クォータニオン)
+        Quaternionf rotate(AngleAxisf(1.2f, Vector3f::UnitZ()));
+
+        // アフィン変換用行列
+        Affine3f aff;
+        aff.rotate(rotate);
+        Matrix4f m(aff.matrix());
+
+        glUniformMatrix4fv(guMVMatrix, 1, GL_TRUE, (GLfloat*)m.data());
+    }
+
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
