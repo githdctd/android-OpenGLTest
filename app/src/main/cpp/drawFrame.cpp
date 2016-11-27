@@ -13,16 +13,20 @@ static double prev_time = 0;
 static int frame_count = 0;
 
 const char gVertexShader[] =
-        "attribute vec4 vPosition;\n"
+        "attribute vec4 aPosition;\n"
+        "attribute vec4 aColor;\n"
+        "varying vec4 vColor;\n"
         "void main() {\n"
-        "  gl_Position = vPosition;\n"
+        "  gl_Position = aPosition;\n"
+        "  vColor = aColor;\n"
         "}\n";
 
 
 const char gFragmentShader[] =
         "precision mediump float;\n"
+        "varying vec4 vColor;\n"
         "void main() {\n"
-        "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
+        "  gl_FragColor = vColor;\n"
         "}\n";
 
 
@@ -53,14 +57,16 @@ createProgram(const char* pVertexSource, const char* pFragmentSource)
 }
 
 static GLuint gProgram;
-static GLuint gvPositionHandle;
+static GLuint gaPositionHandle;
+static GLuint gaColorHandle;
 
 int
 init_frame(struct gfx *gfx)
 {
     glViewport(0, 0, gfx->width, gfx->height);
     gProgram = createProgram(gVertexShader, gFragmentShader);
-    gvPositionHandle = glGetAttribLocation(gProgram, "vPosition");
+    gaPositionHandle = glGetAttribLocation(gProgram, "aPosition");
+    gaColorHandle = glGetAttribLocation(gProgram, "aColor");
 
     return 0;
 }
@@ -75,14 +81,17 @@ void draw_frame(struct gfx *gfx)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const GLfloat vertices[] = {
-            0.0f,  0.5f,
-            -0.5f, -0.5f,
-            0.5f, -0.5f,
+    const GLfloat points[] = {
+             0.0f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+             0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
     };
+    int stride = sizeof(GLfloat)*6;
     glUseProgram(gProgram);
-    glVertexAttribPointer(gvPositionHandle, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-    glEnableVertexAttribArray(gvPositionHandle);
+    glVertexAttribPointer(gaPositionHandle, 2, GL_FLOAT, GL_FALSE, stride, points);
+    glEnableVertexAttribArray(gaPositionHandle);
+    glVertexAttribPointer(gaColorHandle, 4, GL_FLOAT, GL_FALSE, stride, &points[2]);
+    glEnableVertexAttribArray(gaColorHandle);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     eglSwapBuffers(gfx->display, gfx->surface);
