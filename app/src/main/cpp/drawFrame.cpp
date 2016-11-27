@@ -14,16 +14,16 @@ static int frame_count = 0;
 
 const char gVertexShader[] =
         "attribute vec4 vPosition;\n"
-                "void main() {\n"
-                "  gl_Position = vPosition;\n"
-                "}\n";
+        "void main() {\n"
+        "  gl_Position = vPosition;\n"
+        "}\n";
 
 
 const char gFragmentShader[] =
         "precision mediump float;\n"
-                "void main() {\n"
-                "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
-                "}\n";
+        "void main() {\n"
+        "  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
+        "}\n";
 
 
 GLuint
@@ -52,10 +52,15 @@ createProgram(const char* pVertexSource, const char* pFragmentSource)
     return program;
 }
 
+static GLuint gProgram;
+static GLuint gvPositionHandle;
+
 int
 init_frame(struct gfx *gfx)
 {
     glViewport(0, 0, gfx->width, gfx->height);
+    gProgram = createProgram(gVertexShader, gFragmentShader);
+    gvPositionHandle = glGetAttribLocation(gProgram, "vPosition");
 
     return 0;
 }
@@ -67,15 +72,13 @@ void draw_frame(struct gfx *gfx)
         return;
     }
 
-    GLuint gProgram = createProgram(gVertexShader, gFragmentShader);
-    GLuint gvPositionHandle = glGetAttribLocation(gProgram, "vPosition");
     glClearColor(0.0f, 0.0f, 0.0f, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     const GLfloat vertices[] = {
             0.0f,  0.5f,
             -0.5f, -0.5f,
-            0.5f, -0.5f
+            0.5f, -0.5f,
     };
     glUseProgram(gProgram);
     glVertexAttribPointer(gvPositionHandle, 2, GL_FLOAT, GL_FALSE, 0, vertices);
