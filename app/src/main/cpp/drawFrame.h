@@ -28,13 +28,7 @@ struct gfx {
     struct saved_state state;
 };
 
-class drawFrame {
-public:
-    drawFrame() {};
-    ~drawFrame() {};
-    void update(void);
-};
-
+int init_frame(struct gfx *gfx);
 void draw_frame(struct gfx *gfx);
 
 #endif //OPENGLTEST_DRAWDRAME_H
