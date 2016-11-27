@@ -26,7 +26,26 @@
 #include <android/log.h>
 #include <android_native_app_glue.h>
 
-#include "OpenGLTest.h"
+#include <EGL/egl.h>
+#include <GLES/gl.h>
+
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+
+#include "drawFrame.h"
+
+/**
+ * Shared state for our app.
+ */
+struct engine {
+    struct android_app* app;
+
+    ASensorManager* sensorManager;
+    const ASensor* accelerometerSensor;
+    ASensorEventQueue* sensorEventQueue;
+
+    struct gfx gfx;
+};
 
 /**
  * Initialize an EGL context for the current display.
