@@ -136,8 +136,20 @@ void draw_frame(struct gfx *gfx)
 
         // アフィン変換用行列
         Affine3f aff;
-        aff.rotate(rotate);
+        aff = aff.scale(0.4);
         Matrix4f m(aff.matrix());
+
+        GLfloat* p;
+        p = (GLfloat*)m.data();
+        *p++ = 0.1; *p++ = 0.2; *p++ = 0.3; *p++ = 0.4;
+        *p++ = 0.2; *p++ = 0.3; *p++ = 0.4; *p++ = 0.1;
+        *p++ = 0.3; *p++ = 0.4; *p++ = 0.1; *p++ = 0.2;
+        *p++ = 0.4; *p++ = 0.1; *p++ = 0.2; *p++ = 0.3;
+        p = (GLfloat*)m.data();
+        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[0], p[1], p[2], p[3]);
+        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[4], p[5], p[6], p[7]);
+        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[8], p[9], p[10], p[11]);
+        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[12], p[13], p[14], p[15]);
 
         glUniformMatrix4fv(guMVMatrix, 1, GL_TRUE, (GLfloat*)m.data());
     }
