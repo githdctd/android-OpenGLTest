@@ -12,7 +12,7 @@
  * Our saved state data.
  */
 struct saved_state {
-    float angle;
+    int angle;
     int32_t x;
     int32_t y;
     float acc_x, acc_y, acc_z;

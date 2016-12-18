@@ -12,17 +12,21 @@
 #include "Util.h"
 #include "drawFrame.h"
 
+using namespace Eigen;
 static double prev_time = 0;
 static int frame_count = 0;
+
+#define MAXTRIANGLES 2000
+static GLfloat points[MAXTRIANGLES * 3];
+static GLfloat colors[MAXTRIANGLES * 3];
 
 const char gVertexShader[] =
         "attribute vec3 aPosition;\n"
         "attribute vec3 aColor;\n"
         "uniform mediump mat4 uMVMat;\n"
-        "uniform mediump mat4 uPMat;\n"
         "varying vec4 vColor;\n"
         "void main() {\n"
-        "  gl_Position = uMVMat * uPMat * vec4(aPosition, 1.0);\n"
+        "  gl_Position = uMVMat * vec4(aPosition, 1.0);\n"
         "  vColor = vec4(aColor, 0.0);\n"
         "}\n";
 
@@ -65,7 +69,31 @@ static GLuint gProgram;
 static GLuint gaPositionHandle;
 static GLuint gaColorHandle;
 static GLint guMVMatrix;
-static GLint guPMatrix;
+
+void
+print_m(Matrix4f &m) {
+    GLfloat *p;
+    p = (GLfloat *) m.data();
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[0], p[1], p[2], p[3]);
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[4], p[5], p[6], p[7]);
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[8], p[9], p[10], p[11]);
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[12], p[13], p[14], p[15]);
+}
+
+void
+print_m(Affine3f &m) {
+    GLfloat *p;
+    p = (GLfloat *) m.matrix().data();
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[0], p[1], p[2], p[3]);
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[4], p[5], p[6], p[7]);
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[8], p[9], p[10], p[11]);
+    Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[12], p[13], p[14], p[15]);
+}
+
+float random(float max)
+{
+    return ((float)std::rand() * max)/RAND_MAX;
+}
 
 int
 init_frame(struct gfx *gfx)
@@ -75,11 +103,19 @@ init_frame(struct gfx *gfx)
     gaPositionHandle = glGetAttribLocation(gProgram, "aPosition");
     gaColorHandle = glGetAttribLocation(gProgram, "aColor");
     guMVMatrix = glGetUniformLocation(gProgram, "uMVMat");
-    guPMatrix = glGetUniformLocation(gProgram, "uPMat");
+    Util::log("surface size = %d x %d\n", gfx->width, gfx->height);
     Util::log("aPosition = %ld\n", gaPositionHandle);
     Util::log("aColor = %ld\n", gaColorHandle);
     Util::log("guMVMatrix = %ld\n", guMVMatrix);
-    Util::log("guPMatrix = %ld\n", guPMatrix);
+
+    for (int i = 0; i < MAXTRIANGLES; i++) {
+        points[i * 3 + 0] = random(2.0) - 1.0;
+        points[i * 3 + 1] = random(2.0) - 1.0;
+        points[i * 3 + 2] = random(2.0) - 1.0;
+        colors[i * 3 + 0] = random(1.0);
+        colors[i * 3 + 1] = random(1.0);
+        colors[i * 3 + 2] = random(1.0);
+    }
 
     return 0;
 }
@@ -94,68 +130,26 @@ void draw_frame(struct gfx *gfx)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const GLfloat mat_mv[] = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-    };
-    const GLfloat mat_p[] = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-    };
-
-    const GLfloat points[] = {
-             0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-    };
-    int stride = sizeof(GLfloat)*6;
+    int stride = sizeof(GLfloat)*3;
     glUseProgram(gProgram);
 
-    glUniformMatrix4fv(guMVMatrix, 1, GL_FALSE, mat_mv);
-    glUniformMatrix4fv(guPMatrix, 1, GL_FALSE, mat_p);
     glVertexAttribPointer(gaPositionHandle, 3, GL_FLOAT, GL_FALSE, stride, points);
     glEnableVertexAttribArray(gaPositionHandle);
-    glVertexAttribPointer(gaColorHandle, 3, GL_FLOAT, GL_FALSE, stride, &points[3]);
+    glVertexAttribPointer(gaColorHandle, 3, GL_FLOAT, GL_FALSE, stride, colors);
     glEnableVertexAttribArray(gaColorHandle);
 
-    {
-        using namespace Eigen;
+    // アフィン変換行列
+    AngleAxisf rx(M_PI/241 * gfx->state.angle, Vector3f::UnitX());
+    AngleAxisf ry(M_PI/307 * gfx->state.angle, Vector3f::UnitY());
+    AngleAxisf rz(M_PI/367 * gfx->state.angle, Vector3f::UnitZ());
+    Affine3f aff(rx * ry * rz);
+    Matrix4f m(aff.matrix());
+    //Util::log("#### rotation: %d", rotation);
+    //print_m(m);
+    gfx->state.angle++;
+    glUniformMatrix4fv(guMVMatrix, 1, GL_FALSE, (GLfloat*)m.data());
 
-        // 平行移動(x, y, z)
-        Translation<float, 3> translation = Translation<float, 3>(10.0f, 0.5f, -3.0f);
-
-        // スケーリング
-        DiagonalMatrix<float, 3> scaling = Scaling(2.0f, 1.5f, 1.0f);
-
-        // 回転(クォータニオン)
-        Quaternionf rotate(AngleAxisf(1.2f, Vector3f::UnitZ()));
-
-        // アフィン変換用行列
-        Affine3f aff;
-        aff = aff.scale(0.4);
-        Matrix4f m(aff.matrix());
-
-        GLfloat* p;
-        p = (GLfloat*)m.data();
-        *p++ = 0.1; *p++ = 0.2; *p++ = 0.3; *p++ = 0.4;
-        *p++ = 0.2; *p++ = 0.3; *p++ = 0.4; *p++ = 0.1;
-        *p++ = 0.3; *p++ = 0.4; *p++ = 0.1; *p++ = 0.2;
-        *p++ = 0.4; *p++ = 0.1; *p++ = 0.2; *p++ = 0.3;
-        p = (GLfloat*)m.data();
-        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[0], p[1], p[2], p[3]);
-        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[4], p[5], p[6], p[7]);
-        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[8], p[9], p[10], p[11]);
-        Util::log("%8.4f %8.4f %8.4f %8.4f\n", p[12], p[13], p[14], p[15]);
-
-        glUniformMatrix4fv(guMVMatrix, 1, GL_TRUE, (GLfloat*)m.data());
-    }
-
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, MAXTRIANGLES);
 
     eglSwapBuffers(gfx->display, gfx->surface);
 

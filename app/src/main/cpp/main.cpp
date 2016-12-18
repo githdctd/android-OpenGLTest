@@ -301,12 +301,6 @@ void android_main(struct android_app* state) {
         }
 
         if (engine.gfx.animating) {
-            // Done with events; draw next animation frame.
-            engine.gfx.state.angle += .01f;
-            if (engine.gfx.state.angle > 1) {
-                engine.gfx.state.angle = 0;
-            }
-
             // Drawing is throttled to the screen update rate, so there
             // is no need to do timing here.
             draw_frame(&engine.gfx);
