@@ -64,6 +64,7 @@ static int engine_init_display(struct engine* engine) {
             EGL_GREEN_SIZE, 8,
             EGL_RED_SIZE, 8,
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            //EGL_SAMPLE_BUFFERS, 1,
             EGL_NONE
     };
     const EGLint contextAttribs[] = {
