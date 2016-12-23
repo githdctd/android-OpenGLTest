@@ -35,6 +35,7 @@ const char gFragmentShader[] =
         "precision mediump float;\n"
         "varying vec4 vColor;\n"
         "void main() {\n"
+        //"  gl_FragColor = vec4(vec3(gl_FragCoord.z), 1.0);\n"
         "  gl_FragColor = vColor;\n"
         "}\n";
 
@@ -128,7 +129,8 @@ void draw_frame(struct gfx *gfx)
     }
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearDepthf(1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     int stride = sizeof(GLfloat)*3;
     glUseProgram(gProgram);
@@ -149,6 +151,7 @@ void draw_frame(struct gfx *gfx)
     gfx->state.angle++;
     glUniformMatrix4fv(guMVMatrix, 1, GL_FALSE, (GLfloat*)m.data());
 
+    glDepthMask(true);
     glDrawArrays(GL_TRIANGLES, 0, MAXTRIANGLES);
 
     eglSwapBuffers(gfx->display, gfx->surface);

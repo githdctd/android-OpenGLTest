@@ -96,14 +96,17 @@ static int engine_init_display(struct engine* engine) {
         if (eglGetConfigAttrib(display, cfg, EGL_RED_SIZE, &r)   &&
             eglGetConfigAttrib(display, cfg, EGL_GREEN_SIZE, &g) &&
             eglGetConfigAttrib(display, cfg, EGL_BLUE_SIZE, &b)  &&
-            eglGetConfigAttrib(display, cfg, EGL_DEPTH_SIZE, &d) &&
-            r == 8 && g == 8 && b == 8 && d == 0 ) {
-
-            config = supportedConfigs[i];
-            break;
+            eglGetConfigAttrib(display, cfg, EGL_DEPTH_SIZE, &d)) {
+            LOGI("OpenGL config attrib RGB/D: %d: %d%d%d/%d", i, r, g, b, d);
+            if (r == 8 && g == 8 && b == 8 && d == 24 ) {
+                LOGI("Choose config: %d", i);
+                config = supportedConfigs[i];
+                break;
+            }
         }
     }
     if (i == numConfigs) {
+        LOGW("Choose DEAFULT config: 0");
         config = supportedConfigs[0];
     }
 
@@ -120,6 +123,8 @@ static int engine_init_display(struct engine* engine) {
         LOGW("Unable to eglMakeCurrent");
         return -1;
     }
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
     eglQuerySurface(display, surface, EGL_WIDTH, &w);
     eglQuerySurface(display, surface, EGL_HEIGHT, &h);
